@@ -24,7 +24,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - "5050:80" # Expose PgAdmin on port 5050 of the host
+      - "5050:80"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     networks:
@@ -51,20 +51,15 @@ services:
     networks:
       - app-network
 
-volumes:
-  postgres-data:
-  pgadmin-data:
-
-networks:
-  app-network:
-
-    zookeeper:
+  zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - app-network
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -78,6 +73,8 @@ networks:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - app-network
 
   celeryworker:
     build:
@@ -90,3 +87,13 @@ networks:
       - fastapi
     environment:
       - CELERY_BROKER_URL=kafka://kafka:9092
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+  pgadmin-data:
+
+networks:
+  app-network:
+    driver: bridge
