@@ -19,6 +19,7 @@ Key Highlights:
 """
 
 from builtins import dict, int, len, str
+from app.utils.kafka_producer import publish_email_event
 from datetime import timedelta
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
@@ -195,9 +196,20 @@ async def list_users(
 @router.post("/register/", response_model=UserResponse, tags=["Login and Registration"])
 async def register(user_data: UserCreate, session: AsyncSession = Depends(get_db), email_service: EmailService = Depends(get_email_service)):
     user = await UserService.register_user(session, user_data.model_dump(), email_service)
+    
     if user:
+        # 🚀 Publish Email Event to Kafka
+        event_payload = {
+            "to": user.email,
+            "subject": "Welcome to Our Platform!",
+            "body": "Thank you for registering. Please verify your account using the link sent to your email."
+        }
+        publish_email_event("account.verification", event_payload)
+
         return user
+
     raise HTTPException(status_code=400, detail="Email already exists")
+
 
 @router.post("/login/", response_model=TokenResponse, tags=["Login and Registration"])
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_db)):
