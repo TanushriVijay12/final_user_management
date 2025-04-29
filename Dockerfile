@@ -1,5 +1,5 @@
 # Define a base stage with a Debian Bookworm base image that includes the latest glibc update
-FROM python:3.13-bookworm AS base
+FROM python:3.12-bookworm AS base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -15,9 +15,10 @@ WORKDIR /myapp
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
-    && apt-get install -y libc-bin=2.36-9+deb12u7 \
+    libc-bin \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Install Python dependencies in /.venv
 COPY requirements.txt .
@@ -30,9 +31,8 @@ RUN python -m venv /.venv \
 FROM python:3.12-slim-bookworm AS final
 
 # Upgrade libc-bin in the final stage to ensure security patch is applied
-RUN apt-get update && apt-get install -y libc-bin=2.36-9+deb12u7 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libc-bin && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Copy the virtual environment from the base stage
 COPY --from=base /.venv /.venv
