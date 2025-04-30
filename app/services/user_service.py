@@ -12,8 +12,14 @@ from app.schemas.user_schemas import UserCreate, UserUpdate
 from app.utils.nickname_gen import generate_nickname
 from app.utils.security import generate_verification_token, hash_password, verify_password
 from uuid import UUID
-from app.services.email_service import EmailService
+from app.tasks.email_tasks import (
+    send_verification_email_task,
+    send_account_locked_email_task,
+    send_account_unlocked_email_task,
+    send_role_upgrade_email_task
+)
 from app.models.user_model import UserRole
+from app.events.kafka_producer import send_event
 import logging
 
 settings = get_settings()
@@ -71,7 +77,8 @@ class UserService:
 
             else:
                 new_user.verification_token = generate_verification_token()
-                await email_service.send_verification_email(new_user)
+                send_verification_email_task.delay(str(new_user.id), new_user.email, new_user.verification_token)
+
 
             session.add(new_user)
             await session.commit()
@@ -141,6 +148,7 @@ class UserService:
                 user.failed_login_attempts += 1
                 if user.failed_login_attempts >= settings.max_login_attempts:
                     user.is_locked = True
+                    send_account_locked_email_task.delay(str(user.id), user.email)
                 session.add(user)
                 await session.commit()
         return None
@@ -171,6 +179,7 @@ class UserService:
             user.email_verified = True
             user.verification_token = None  # Clear the token once used
             user.role = UserRole.AUTHENTICATED
+            send_role_upgrade_email_task.delay(str(user.id), user.email, str(user.role.name))
             session.add(user)
             await session.commit()
             return True
@@ -197,5 +206,6 @@ class UserService:
             user.failed_login_attempts = 0  # Optionally reset failed login attempts
             session.add(user)
             await session.commit()
+            send_account_unlocked_email_task.delay(str(user.id), user.email)
             return True
         return False
