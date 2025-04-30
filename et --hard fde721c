@@ -1,0 +1,57 @@
+* [33m10f8b78[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/celery-kafka-email[m[33m, [m[1;31morigin/fix/github-actions-kafka[m[33m, [m[1;31morigin/feature/celery-kafka-email[m[33m, [m[1;32mfix/github-actions-kafka[m[33m)[m Added develop and feature branches to github actions workflow
+* [33mfde721c[m Implement Celery + Kafka email system
+* [33mec2ecab[m Emit Kafka events via Celery tasks for user email notifications
+* [33md8b7a4f[m Refactor UserService to emit Kafka events for email notifications
+* [33m1b2c81a[m Add Celery email tasks for account events
+* [33m34424a6[m Add kafka consumer in celery_worker.py to listen and trigger email tasks
+* [33m5aeff53[m Fix service and network structure for Kafka, Zookeeper, and Celery worker
+* [33mfea41fe[m 👂 Add Kafka consumer to Celery worker for email event processing
+* [33m3d7f2e6[m 📧 Refactor /register to publish account.verification event to Kafka instead of sending email directly
+* [33mae55049[m Add kafka producer utility for publishing email events, add celery and kafka dependencies to requirements.txt
+* [33m4dc5be9[m 🚀 Create basic Celery worker with sample email task
+* [33m42b5742[m 🔧 Add Kafka, Zookeeper, and Celery worker to docker-compose.yml
+[31m|[m *   [33mfd1dab1[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on feature/profile-picture-upload: 33e4905 Add Minio config fields to Settings model
+[31m|[m [32m|[m[33m\[m  
+[31m|[m [32m|[m * [33m5affdf6[m index on feature/profile-picture-upload: 33e4905 Add Minio config fields to Settings model
+[31m|[m [32m|[m[32m/[m  
+[31m|[m * [33m33e4905[m Add Minio config fields to Settings model
+[31m|[m * [33m25fa117[m Add service method to update user's profile picture URL
+[31m|[m * [33m5fb2e68[m Add upload profile picture API endpoint using Minio
+[31m|[m * [33mc38d4ad[m added a minio client
+[31m|[m * [33mda3ac32[m Add Minio object storage service to Docker Compose setup
+[31m|[m[31m/[m  
+* [33mc2f7278[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/develop[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mdevelop[m[33m)[m Fix GitHub Actions: change Docker image tag to use my DockerHub username
+* [33mf352c55[m Update .env.sample with correct smtp settings
+* [33m3618566[m Fix Docker build: remove all libc-bin version pins to avoid downgrade errors
+* [33mba5af3f[m Test DockerHub login from GitHub Actions
+* [33m9330e63[m Test DockerHub login from GitHub Actions
+* [33m84ca14f[m Fix invalid environment key in GitHub Actions workflow
+* [33m1395565[m Casing mismatch in FROM .. as in Dockerfile - solved
+*   [33mf439911[m Merge pull request #68 from mjedryczka/1-docker-build-attempts-and-fails-to-install-package
+[34m|[m[35m\[m  
+[34m|[m * [33mc528931[m Updated libc-bin version
+[34m|[m[34m/[m  
+* [33m7f8366d[m Update readme.md
+* [33m827624f[m Update features.md
+* [33mb4260bf[m Update readme.md
+* [33m728540b[m Update Dockerfile try to fix security alert on libc
+* [33mb6be975[m Update Dockerfile
+* [33m1dbe3b8[m Update Dockerfile
+* [33mba740fa[m Update license.txt
+* [33ma63fc49[m Update readme.md
+* [33m2fca411[m Update readme.md
+* [33m132a338[m Update system_documentation.md
+* [33m0bfc5aa[m Update features.md
+* [33mbe5de5c[m update
+* [33me203205[m fixed grammer and spelling
+* [33ma7551fb[m fixed grammer and spelling
+* [33mbb3eed9[m fixed grammer and spelling
+* [33m0d755ed[m updated assignment
+* [33m6dfdc87[m fixed grammer and spelling
+* [33m4da06a8[m updated gunicorn
+* [33mea24d5a[m updated docs
+* [33m66b93fd[m updated docs
+* [33m11bde8b[m updated docs
+* [33m7eebbc4[m final project
+* [33m10ac8ee[m oh wow i think it works
+* [33m7b95a38[m initial commit

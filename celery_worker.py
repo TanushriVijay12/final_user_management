@@ -16,11 +16,11 @@ celery_app = Celery(
 # Kafka consumer config
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
 KAFKA_TOPICS = [
-    "account_verification",
-    "account_lock",
-    "account_unlock",
-    "role_upgrade",
-    "status_upgrade"
+    "email.account.verification",
+    "email.account.lock",
+    "email.account.unlock",
+    "email.role.upgrade",
+    "email.status.professional"
 ]
 
 def kafka_event_listener():
@@ -40,8 +40,9 @@ def kafka_event_listener():
         print(f"📩 Received Kafka message on topic `{message.topic}`: {message.value}")
         payload = message.value
 
-        # Dispatch to Celery task
+        # Add the topic name to the payload so Celery knows what type it is
+        payload["event"] = message.topic.replace("email.", "")
         send_email_task.delay(payload)
-
+        
 # Launch the Kafka consumer in a background thread when the worker starts
 threading.Thread(target=kafka_event_listener, daemon=True).start()

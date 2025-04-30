@@ -19,6 +19,7 @@ from app.tasks.email_tasks import (
     send_account_unlocked_email_task,
     send_role_upgrade_email_task
 )
+from app.events.kafka_producer import send_event
 import logging
 
 settings = get_settings()
@@ -79,6 +80,12 @@ class UserService:
             else:
                 new_user.verification_token = generate_verification_token()
                 send_verification_email_task.delay(str(new_user.id), new_user.email, new_user.verification_token)
+
+                # DEBUG: Publish Kafka event for verification tracking
+                await send_event("account.verification", {
+                    "email": new_user.email,
+                    "token": new_user.verification_token
+                })
 
             session.add(new_user)
             await session.commit()
