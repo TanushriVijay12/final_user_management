@@ -1,12 +1,9 @@
-from kafka import KafkaProducer
+from confluent_kafka import Producer
 import json
 
-producer = KafkaProducer(
-    bootstrap_servers=['kafka:9092'],
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
-)
+producer = Producer({'bootstrap.servers': 'kafka:9092'})
 
 def publish_email_event(event_type: str, data: dict):
     topic = f"email.{event_type}"
-    producer.send(topic, value=data)
+    producer.produce(topic, value=json.dumps(data).encode('utf-8'))
     producer.flush()

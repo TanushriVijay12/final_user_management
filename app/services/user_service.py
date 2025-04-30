@@ -14,10 +14,10 @@ from app.utils.security import generate_verification_token, hash_password, verif
 from uuid import UUID
 from app.models.user_model import UserRole
 from app.tasks.email_tasks import (
-    send_verification_email_task,
-    send_account_locked_email_task,
-    send_account_unlocked_email_task,
-    send_role_upgrade_email_task
+    send_account_verification_email,
+    send_account_locked_email,
+    send_account_unlocked_email,
+    send_role_upgrade_email
 )
 from app.events.kafka_producer import send_event
 import logging
@@ -79,13 +79,19 @@ class UserService:
                 new_user.email_verified = True
             else:
                 new_user.verification_token = generate_verification_token()
-                send_verification_email_task.delay(str(new_user.id), new_user.email, new_user.verification_token)
 
-                # DEBUG: Publish Kafka event for verification tracking
+                # Save user before triggering async operations
+                session.add(new_user)
+                await session.commit()
+
+                # Now safely send email and Kafka event
+                send_account_verification_email.delay(str(new_user.id), new_user.email, new_user.verification_token)
+
                 await send_event("account.verification", {
                     "email": new_user.email,
                     "token": new_user.verification_token
                 })
+
 
             session.add(new_user)
             await session.commit()
@@ -156,7 +162,7 @@ class UserService:
                 user.failed_login_attempts += 1
                 if user.failed_login_attempts >= settings.max_login_attempts:
                     user.is_locked = True
-                    send_account_locked_email_task.delay(str(user.id), user.email)
+                    send_account_locked_email.delay(str(user.id), user.email)
                 session.add(user)
                 await session.commit()
         return None
@@ -186,7 +192,7 @@ class UserService:
             user.email_verified = True
             user.verification_token = None
             user.role = UserRole.AUTHENTICATED
-            send_role_upgrade_email_task.delay(str(user.id), user.email, str(user.role.name))
+            send_role_upgrade_email.delay(str(user.id), user.email, str(user.role.name))
             session.add(user)
             await session.commit()
             return True
@@ -207,6 +213,6 @@ class UserService:
             user.failed_login_attempts = 0
             session.add(user)
             await session.commit()
-            send_account_unlocked_email_task.delay(str(user.id), user.email)
+            send_account_unlocked_email.delay(str(user.id), user.email)
             return True
         return False
