@@ -26,6 +26,39 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq:3.8-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+  
+      kafka:
+        image: bitnami/kafka:latest
+        env:
+          KAFKA_BROKER_ID: 1
+          KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+          KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+        ports:
+          - 9092:9092
+        options: >-
+          --health-cmd "kafka-topics.sh --list --bootstrap-server localhost:9092"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 5
+  
+      zookeeper:
+        image: bitnami/zookeeper:latest
+        env:
+          ALLOW_ANONYMOUS_LOGIN: yes
+        ports:
+          - 2181:2181
+  
     steps:
       - uses: actions/checkout@v4
       
@@ -50,6 +83,8 @@ jobs:
       - name: Run tests with Pytest
         env:
           DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/myappdb  # Configure the DATABASE_URL environment variable for tests
+          CELERY_BROKER_URL: amqp://guest:guest@localhost:5672//
+          EMAIL_QUEUE: email_tasks
         run: pytest
 
   build-and-push-docker:
