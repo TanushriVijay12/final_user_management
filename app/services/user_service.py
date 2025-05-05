@@ -149,7 +149,7 @@ class UserService:
                 user.failed_login_attempts += 1
                 if user.failed_login_attempts >= settings.max_login_attempts:
                     user.is_locked = True
-                    send_account_locked_email.delay(str(user.id), user.email)
+                    send_account_locked_email.delay(user.email)
                 session.add(user)
                 await session.commit()
         return None
@@ -179,7 +179,7 @@ class UserService:
             user.email_verified = True
             user.verification_token = None
             user.role = UserRole.AUTHENTICATED
-            send_role_upgrade_email.delay(str(user.id), user.email, str(user.role.name))
+            send_role_upgrade_email.delay(user.email, str(user.role.name))
             session.add(user)
             await session.commit()
             return True
@@ -200,6 +200,6 @@ class UserService:
             user.failed_login_attempts = 0
             session.add(user)
             await session.commit()
-            send_account_unlocked_email.delay(str(user.id), user.email)
+            send_account_unlocked_email.delay(user.email)
             return True
         return False
