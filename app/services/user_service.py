@@ -14,7 +14,7 @@ from app.utils.security import generate_verification_token, hash_password, verif
 from uuid import UUID
 from app.models.user_model import UserRole
 from app.tasks.email_tasks import (
-    send_verification_email_task,
+    # send_verification_email_task,
     send_account_locked_email_task,
     send_account_unlocked_email_task,
     send_role_upgrade_email_task
@@ -78,7 +78,7 @@ class UserService:
                 new_user.email_verified = True
             else:
                 new_user.verification_token = generate_verification_token()
-                send_verification_email_task.delay(str(new_user.id), new_user.email, new_user.verification_token)
+                # send_verification_email_task.delay(str(new_user.id), new_user.email, new_user.verification_token)
 
             session.add(new_user)
             await session.commit()
