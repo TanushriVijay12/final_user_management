@@ -79,6 +79,10 @@ class User(Base):
         """Provides a readable representation of a user object."""
         return f"<User {self.nickname}, Role: {self.role.name}>"
 
+    # User model's string conversion more readable 
+    def __str__(self):
+        return f"{self.nickname} ({self.email})"
+
     def lock_account(self):
         self.is_locked = True
 

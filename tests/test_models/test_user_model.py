@@ -31,6 +31,14 @@ async def test_user_repr(user: User):
     assert repr(user) == f"<User {user.nickname}, Role: {user.role.name}>", "__repr__ should include nickname and role"
 
 @pytest.mark.asyncio
+async def test_user_str(user: User):
+    """
+    Tests the __str__ method for human-readable string representation.
+    """
+    expected_str = f"{user.nickname} ({user.email})"
+    assert str(user) == expected_str, "__str__ should return 'nickname (email)'"
+
+@pytest.mark.asyncio
 async def test_failed_login_attempts_increment(db_session: AsyncSession, user: User):
     """
     Tests that failed login attempts can be incremented and persisted correctly.
