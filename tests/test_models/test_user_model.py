@@ -147,3 +147,12 @@ async def test_update_user_role(db_session: AsyncSession, user: User):
     await db_session.commit()
     await db_session.refresh(user)
     assert user.role == UserRole.ADMIN, "Role update should persist correctly in the database"
+
+@pytest.mark.asyncio
+async def test_is_admin_helper(user: User, admin_user: User):
+    """
+    Tests the is_admin() helper method.
+    """
+    assert not user.is_admin(), "Regular user should not be admin"
+    assert admin_user.is_admin(), "Admin user should return True for is_admin()"
+
