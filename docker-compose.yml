@@ -32,13 +32,15 @@ services:
 
   fastapi:
     build: .
-    volumes:
-      - ./:/myapp/
+    #volumes:
+    #  - ./:/myapp/
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - app-network
+    ports:
+      - "8000:8000"
 
   nginx:
     image: nginx:latest

@@ -179,7 +179,7 @@ class UserService:
             user.email_verified = True
             user.verification_token = None
             user.role = UserRole.AUTHENTICATED
-            send_role_upgrade_email.delay(user.email, str(user.role.name))
+            send_role_upgrade_email.delay(str(user.id), user.email, str(user.role.name))
             session.add(user)
             await session.commit()
             return True
