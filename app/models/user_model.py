@@ -95,6 +95,9 @@ class User(Base):
     def has_role(self, role_name: UserRole) -> bool:
         return self.role == role_name
 
+    def is_admin(self) -> bool:
+        return self.role == UserRole.ADMIN
+
     def update_professional_status(self, status: bool):
         """Updates the professional status and logs the update time."""
         self.is_professional = status
