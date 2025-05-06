@@ -5,6 +5,8 @@ from app.dependencies import get_settings
 from app.models.user_model import User, UserRole
 from app.services.user_service import UserService
 from app.utils.nickname_gen import generate_nickname
+from unittest.mock import patch
+from uuid import UUID
 
 pytestmark = pytest.mark.asyncio
 
@@ -161,3 +163,18 @@ async def test_unlock_user_account(db_session, locked_user):
     assert unlocked, "The account should be unlocked"
     refreshed_user = await UserService.get_by_id(db_session, locked_user.id)
     assert not refreshed_user.is_locked, "The user should no longer be locked"
+
+@pytest.mark.asyncio
+async def test_send_role_upgrade_email_called(db_session, user):
+    token = "test-token"
+    user.verification_token = token
+    await db_session.commit()
+    await db_session.refresh(user)
+
+    with patch("app.tasks.email_tasks.send_role_upgrade_email.delay") as mock_send_email:
+        result = await UserService.verify_email_with_token(db_session, user.id, token)
+
+        assert result is True
+        assert user.email_verified is True
+        assert user.role == UserRole.AUTHENTICATED
+        mock_send_email.assert_called_once_with(str(user.id), user.email, str(UserRole.AUTHENTICATED.name))

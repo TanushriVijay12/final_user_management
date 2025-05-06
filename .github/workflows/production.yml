@@ -82,7 +82,7 @@ jobs:
           
       - name: Run tests with Pytest
         env:
-          DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/myappdb  # Configure the DATABASE_URL environment variable for tests
+          DATABASE_URL: postgresql+asyncpg://user:password@postgres:5432/myappdb  # Configure the DATABASE_URL environment variable for tests
           CELERY_BROKER_URL: amqp://guest:guest@localhost:5672//
           EMAIL_QUEUE: email_tasks
         run: pytest
